@@ -1,97 +1,88 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
+import { useEffect, useState } from 'react'
+import Child from './Child';
+import './App.css'
 
-const shuffleArray = (array: string[]): string[] => [...array].sort(() => Math.random() - 0.5);
+interface Product {
+  id: number;
+  title: string;
+  images: string[];
+}
 
-const App: React.FC = () => {
-  const [word, setWord] = useState<string>("");
-  const [selectedLetters, setSelectedLetters] = useState<string>("");
-  const [lives, setLives] = useState<number>(5);
-  const [gameOver, setGameOver] = useState<boolean>(false);
-  const [win, setWin] = useState<boolean>(false);
-  const [message, setMessage] = useState<string>("");
-  const [messageColor, setMessageColor] = useState<string>("");
+function App() {
+  const [buttonarr, setButtonarr] = useState<number[]>([1, 2, 3, 4, 5]);
+  const [clickedbutton, setClickedbutton] = useState<number>(1);
+  const [data, setData] = useState<Product[]>([]);
+  const [page, setPage] = useState<number>(1);
 
   useEffect(() => {
-    resetGame();
+    const dataFetch = async () => {
+      try {
+        const res = await fetch('https://dummyjson.com/products?limit=100');
+        const res1 = await res.json();
+        setData(res1.products);
+      } catch (err) {
+        console.error("Error->", err);
+      }
+    };
+    dataFetch();
   }, []);
 
-  const resetGame = (): void => {
-    const newWord: string = shuffleArray(["APPLE", "BANANA", "CHERRY", "GRAPES"])[0];
-    setWord(newWord);
-    setSelectedLetters("");
-    setLives(5);
-    setGameOver(false);
-    setWin(false);
-    setMessage("");
-    setMessageColor("");
-  };
-
-  const handleLetterSelect = (letter: string): void => {
-    if (gameOver || win) return;
-
-    const correctLetter: string = word[selectedLetters.length];
-
-    if (letter === correctLetter) {
-      const updatedLetters = selectedLetters + letter;
-      setSelectedLetters(updatedLetters);
-
-      if (updatedLetters === word) {
-        setWin(true);
-      }
-    } else if (word.includes(letter)) {
-      setMessage("Oops! Right letter at the wrong time");
-      setMessageColor("orange");
-    } else {
-      setLives((prevLives) => {
-        const newLives = prevLives - 1;
-        if (newLives === 0) {
-          setGameOver(true);
-        }
-        return newLives;
-      });
-      setMessage("Oops! Wrong letter at the wrong time");
-      setMessageColor("red");
-    }
-  };
+  const pagedata = data.slice((page - 1) * 10, page * 10);
 
   return (
-    <div className="main-container">
-      <div className="game-container">
-        <h1 className="title">Word Guessing Game</h1>
-        <p className="lives">Lives: {"❤️".repeat(lives)}</p>
-        <div className="word-display">
-          {Array.from({ length: word.length }).map((_, index) => (
-            <div key={index} className={`letter-box ${selectedLetters[index] ? "filled" : ""}`}>
-              {selectedLetters[index] || ""}
-            </div>
-          ))}
-        </div>
-        <p style={{ fontSize: "20px", color: messageColor }}>{message}</p>
-        <div className="letters-container">
-          {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((letter) => (
-            <button
-              key={letter}
-              onClick={() => handleLetterSelect(letter)}
-              className="letter-btn"
-              disabled={gameOver || win}
-            >
-              {letter}
-            </button>
-          ))}
-        </div>
+    <div className="container">
+      <div className='main-container'>
+        {pagedata.map(({ id, title, images }) => (
+          <Child key={id} id={id} title={title} image={images[0]} />
+        ))}
       </div>
+      <div className="buttons">
+        <button 
+          disabled={page<2}
+          onClick={() => {
+          setPage(1);
+          setClickedbutton(1);
+          setButtonarr([1,2,3,4,5]);
+        }}>{'<<'}</button>
+        <button 
+          disabled={page<2}
+        onClick={() => {
+          setPage(prev => Math.max(1, prev - 1));
+          setButtonarr(prev => (prev[0] === 1 ? prev : prev.map(value => value - 1)));
+          setClickedbutton(prev=>prev-1);
+        }}>{'<'}</button>
 
-      {(gameOver || win) && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>{win ? "🎉 You Won!" : "❌ Game Over!"}</h2>
-            <button onClick={resetGame} className="retry-btn">Retry 🔄</button>
-          </div>
-        </div>
-      )}
+        {page >5 && (<p className='dot'>. .</p>)}
+
+        {buttonarr.map((value, index) => (
+          <button key={index} onClick={() => {
+            setPage(value);
+            setClickedbutton(value);
+          }} className={clickedbutton === value ? 'filled' : ''}>
+            {value}
+          </button>
+        ))}
+
+        {page < 10 && (<p className='dot'>. .</p>)}
+
+         <button 
+         disabled={page>9}
+         onClick={() => {
+          setPage(prev => Math.min(10, prev + 1));
+          setButtonarr(prev => (prev[prev.length - 1] === 10 ? prev : prev.map(value => value + 1)));
+          setClickedbutton((prev)=>prev+1);
+        }}>{'>'}</button>
+
+        <button 
+          disabled={page>9}
+          onClick={() => {
+          setPage(10);
+          setClickedbutton(10);
+          setButtonarr([6,7,8,9,10]);
+        }}>{'>>'}</button>
+      </div>
     </div>
   );
-};
+}
 
 export default App;
