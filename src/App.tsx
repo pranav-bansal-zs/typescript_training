@@ -1,88 +1,47 @@
-import { useEffect, useState } from 'react'
-import Child from './Child';
+import { useState } from "react";
+import useData from "./useData";
+import Carousel from "./Carousel";
+import { FaRegCircle } from "react-icons/fa";
 import './App.css'
 
-interface Product {
-  id: number;
-  title: string;
-  images: string[];
-}
-
-function App() {
-  const [buttonarr, setButtonarr] = useState<number[]>([1, 2, 3, 4, 5]);
-  const [clickedbutton, setClickedbutton] = useState<number>(1);
-  const [data, setData] = useState<Product[]>([]);
-  const [page, setPage] = useState<number>(1);
-
-  useEffect(() => {
-    const dataFetch = async () => {
-      try {
-        const res = await fetch('https://dummyjson.com/products?limit=100');
-        const res1 = await res.json();
-        setData(res1.products);
-      } catch (err) {
-        console.error("Error->", err);
-      }
-    };
-    dataFetch();
-  }, []);
-
-  const pagedata = data.slice((page - 1) * 10, page * 10);
+const App = () => {
+  const api: string = "http://localhost:3000/images";
+  const { data, error, isLoading } = useData({ api });
+  const [ind, setInd] = useState(0);
 
   return (
-    <div className="container">
-      <div className='main-container'>
-        {pagedata.map(({ id, title, images }) => (
-          <Child key={id} id={id} title={title} image={images[0]} />
-        ))}
+    <div className="main-container">
+      <div className="image-container">
+        {isLoading && <h1>Is Loading</h1>}
+        {!error && !isLoading && (
+          <Carousel
+            src={data[ind]?.src}
+            alt={data[ind]?.alt}
+            id={data[ind]?.id}
+          />
+        )}
+        <button className="button"
+          onClick={() =>
+            setInd((prev: number) => (prev - 1 < 0 ? data.length-1 : prev - 1))
+          }
+        >
+          {"<"}
+        </button>
+        <button className="button"
+          onClick={() =>
+            setInd((prev: number) => (prev + 1 >5 ? 0 : prev + 1))
+          }
+        >
+          {">"}
+        </button>
       </div>
-      <div className="buttons">
-        <button 
-          disabled={page<2}
-          onClick={() => {
-          setPage(1);
-          setClickedbutton(1);
-          setButtonarr([1,2,3,4,5]);
-        }}>{'<<'}</button>
-        <button 
-          disabled={page<2}
-        onClick={() => {
-          setPage(prev => Math.max(1, prev - 1));
-          setButtonarr(prev => (prev[0] === 1 ? prev : prev.map(value => value - 1)));
-          setClickedbutton(prev=>prev-1);
-        }}>{'<'}</button>
-
-        {page >5 && (<p className='dot'>. .</p>)}
-
-        {buttonarr.map((value, index) => (
-          <button key={index} onClick={() => {
-            setPage(value);
-            setClickedbutton(value);
-          }} className={clickedbutton === value ? 'filled' : ''}>
-            {value}
-          </button>
-        ))}
-
-        {page < 10 && (<p className='dot'>. .</p>)}
-
-         <button 
-         disabled={page>9}
-         onClick={() => {
-          setPage(prev => Math.min(10, prev + 1));
-          setButtonarr(prev => (prev[prev.length - 1] === 10 ? prev : prev.map(value => value + 1)));
-          setClickedbutton((prev)=>prev+1);
-        }}>{'>'}</button>
-
-        <button 
-          disabled={page>9}
-          onClick={() => {
-          setPage(10);
-          setClickedbutton(10);
-          setButtonarr([6,7,8,9,10]);
-        }}>{'>>'}</button>
-      </div>
+      <div className="dot">
+  {data.map((_: any, index: number) => (
+    <FaRegCircle key={index} className={ind === index ? "active" : ""} />
+  ))}
+</div>
     </div>
   );
-}
+};
 
 export default App;
