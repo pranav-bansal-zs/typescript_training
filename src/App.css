@@ -64,21 +64,38 @@
 }
 
 .child-container img {
-  width: 700px;
-  height: 400px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   border-radius: 8px;
   transition: animation 0.5s;
-  animation: slide 0.3s ease-in-out;
 }
 
-@keyframes slide {
+.SlideIn{
+  animation: slidein 0.7s ease-in-out;
+}
+.SlideOut{
+  animation: slideout 0.7s ease-in-out;
+}
+
+@keyframes slidein {
   0% {
-    transform: translateX(300px);
-    opacity: 0.8;
+    transform: translateX(100%);
+    opacity: 0.2;
   }
   100% {
-    transform: translateX(0);
+    transform: translateX(0%);
     opacity: 1;
   }
 }
+@keyframes slideout {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+}
+
