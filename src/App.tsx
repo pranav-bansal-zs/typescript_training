@@ -35,6 +35,7 @@ const App: React.FC = () => {
     if (letter === correctLetter) {
       const updatedLetters = selectedLetters + letter;
       setSelectedLetters(updatedLetters);
+      setMessage("");
 
       if (updatedLetters === word) {
         setWin(true);
