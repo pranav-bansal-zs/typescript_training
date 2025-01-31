@@ -17,7 +17,7 @@ const App: React.FC = () => {
   }, []);
 
   const resetGame = (): void => {
-    const newWord: string = shuffleArray(["APPLE", "BANANA", "CHERRY", "GRAPES"])[0];
+    const newWord: string = shuffleArray(["APPLE", "GRASP", "BLITZ", "CHARM","FROST","PLUME","BRISK"])[0];
     setWord(newWord);
     setSelectedLetters("");
     setLives(5);
@@ -41,7 +41,7 @@ const App: React.FC = () => {
         setWin(true);
       }
     } else if (word.includes(letter)) {
-      setMessage("Oops! Right letter at the wrong time");
+      setMessage("Oops! Right letter at the wrong time! Don't worry ,you didn't loose your life.");
       setMessageColor("orange");
     } else {
       setLives((prevLives) => {
@@ -51,7 +51,7 @@ const App: React.FC = () => {
         }
         return newLives;
       });
-      setMessage("Oops! Wrong letter at the wrong time");
+      setMessage("Oops! Wrong letter at the wrong time!Sorry,you have to sacrifice your life.");
       setMessageColor("red");
     }
   };
