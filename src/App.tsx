@@ -16,7 +16,7 @@ function App() {
   useEffect(() => {
     const dataFetch = async () => {
       try {
-        const res = await fetch('https://dummyjson.com/products?limit=300');
+        const res = await fetch('https://dummyjson.com/products?limit=100');
         const res1 = await res.json();
         setData(res1.products);
         setButtonarr(Array.from({ length:Math.ceil(res1.products.length/10) > 5 ? 5 : Math.ceil(res1.products.length/10)}, (value, index) => index + 1))
@@ -26,12 +26,9 @@ function App() {
     };
     dataFetch();
   }, []);
-  const pagedata = data.slice((page - 1) * 10, page * 10);
-  const datalength=Math.ceil(data.length/10);
+  const pagedata = data.slice((page - 1) * 12, page * 12);
+  const datalength=Math.ceil(data.length/12);
   const [buttonarr, setButtonarr] = useState<number[]>([]); 
-  useEffect(()=>{
-    
-  },[datalength])
   return (
     <div className="container">
       <div className='main-container'>
@@ -41,24 +38,35 @@ function App() {
       </div>
       <div className="buttons">
         <button 
-          disabled={page<2}
           onClick={() => {
-          setPage(1);
-          setClickedbutton(1);
-          setButtonarr(Array.from({length:datalength>5?5:datalength},(value,index)=>index+1));
+          setPage((prev=>prev==1?datalength:1));
+          setClickedbutton((prev=>prev==1?datalength:1));
+          setButtonarr(()=>{
+            if(page===1){
+              return Array.from({ length: datalength < 5 ? datalength : 5 }, (_, index) => datalength - index).reverse();
+            }else{
+            return Array.from({length:datalength>5?5:datalength},(value,index)=>index+1)}});
         }}>{'<<'}</button>
         <button 
-          disabled={page<2}
         onClick={() => {
-          setPage(prev => Math.max(1, prev - 1));
-          setButtonarr(prev => (prev[0] === 1 ? prev : prev.map(value => value - 1)));
-          setClickedbutton(prev=>prev-1);
+          setPage((prev => prev-1<1?datalength:prev-1));
+          setButtonarr((prev) => {
+            if (page === 1) {
+              return Array.from({ length: datalength < 5 ? datalength : 5 }, (_, index) => datalength - index).reverse();
+            } 
+            else {
+              return prev[0] === 1 ? prev : prev.map(value => value - 1)}});
+          setClickedbutton((prev => prev-1<1?datalength:prev-1));
         }}>{'<'}</button>
 
-        {page >5 && (<p className='dot'>. .</p>)}
 
         {buttonarr.map((value, index) => (
           <button key={index} onClick={() => {
+            if(value==buttonarr[buttonarr.length-1]){
+              setButtonarr(prev=>prev[prev.length - 1] === datalength ? prev : prev.map(value => value + 1))
+            }else if(value==buttonarr[0]){
+              setButtonarr(prev => (prev[0] === 1 ? prev : prev.map(value => value - 1)));
+            }
             setPage(value);
             setClickedbutton(value);
           }} className={clickedbutton === value ? 'filled' : ''}>
@@ -66,22 +74,32 @@ function App() {
           </button>
         ))}
 
-        {page < datalength && (<p className='dot'>. .</p>)}
 
          <button 
-         disabled={page>datalength-1}
          onClick={() => {
-          setPage(prev => prev==datalength? 0:prev + 1);
-          setButtonarr(prev => (prev[prev.length - 1] === datalength ? prev : prev.map(value => value + 1)));
-          setClickedbutton((prev)=>prev+1);
+          setPage(prev => prev==datalength? 1:prev+ 1);
+          setButtonarr((prev) => {
+            if (page === datalength) {
+              return Array.from({length:datalength>5?5:datalength},(value,index)=>index+1);
+            } 
+            else {
+              return prev[prev.length - 1] === datalength ? prev : prev.map(value => value + 1)}});
+            
+          setClickedbutton(prev => prev==datalength? 1:prev+ 1);
         }}>{'>'}</button>
 
         <button 
-          disabled={page>datalength-1}
           onClick={() => {
-          setPage(datalength);
-          setClickedbutton(datalength);
-          setButtonarr(Array.from({length:datalength<5?datalength:5},(value,index)=>datalength-index).reverse());
+          setPage(page==datalength?1:datalength);
+          setClickedbutton(page==datalength?1:datalength);
+          setButtonarr(() => {
+            if (page === datalength) {
+              return Array.from({length:datalength>5?5:datalength},(value,index)=>index+1);
+            } else {
+              return Array.from({ length: datalength < 5 ? datalength : 5 }, (_, index) => datalength - index).reverse();
+            }
+          });
+          
         }}>{'>>'}</button>
       </div>
     </div>

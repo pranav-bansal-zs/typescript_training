@@ -7,13 +7,13 @@
     align-items: center;
     justify-content: center;
     padding: 10px;
-    border: 2px solid black;
+    box-shadow: 0 4px 8px rgb(153, 149, 149);
     border-radius: 6px;
-    text-overflow: ellipsis;
   }
 .child-container .image-div :hover{
     transform: scale(1.2);
-}
+    transition: transform 0.5s ease;
+}   
 .image-div{
     position: relative;
     width:150px;
