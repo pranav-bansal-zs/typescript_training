@@ -1,0 +1,36 @@
+.main-input-container{
+  height: 100vh;
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center; 
+ background-color:beige;
+}
+.heading{
+  position:absolute;
+  color:rgb(241, 154, 47);
+  top:30px;
+}
+.input-container{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-box{
+  width: 400px;
+  height: 80px;
+  margin-right: 100px;
+  font-size: 30px;
+  color:rgb(241, 154, 47);
+  padding-left: 10px;
+  box-shadow: -7px 7px 11px 3px gray;
+  border-radius:15px ;
+}
+
+.carousel-wrapper {
+  margin-top: 2rem;
+  width: 100%;
+  padding: 0 1rem;
+}
